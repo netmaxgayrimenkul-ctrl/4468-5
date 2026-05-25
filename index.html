@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link rel="icon" type="image/png" href="images/logo.png">
+<meta property="og:image" content="https://netmaxgayrimenkul-ctrl.github.io/4468-5/images/logo.png">
 <title>Parsel Ucuş + Sunum</title>
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
@@ -213,7 +215,7 @@ body {
 /* ===================================================== */
 #slogan-box {
   position: absolute;
-  left: 25%;
+  left: 22%;
   top: 120px; /* Üst panelle mesafe kısaltıldı (110'dan 75'e) */
   width: 210px; /* Genişlik daraltıldı (210'dan 185'e) */
   background: linear-gradient(135deg, rgba(15,15,20,0.95), rgba(5,5,10,0.92));
@@ -379,20 +381,75 @@ body {
   top:40px;
   left:50%;
   transform:translateX(-50%) translateY(-10px);
+
   width:83vw;
+
   border-radius:5px;
-  border-left: 4px solid #ffb800;
-  border-bottom: 4px solid #ffb800;
+
+  border-left:4px solid #ffb800;
+
   background:rgba(0,0,0,0.88);
+
   z-index:99999;
+
   display:flex;
   flex-direction:column;
+
   opacity:0;
   visibility:hidden;
-  transition: opacity 2s ease-in-out, transform 2s ease-in-out, visibility 2s;
-  tansform: translateX(-50%) translateY(-30px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05);
-  font-family: 'Poppins', 'Segoe UI', sans-serif;
+
+  overflow:hidden;
+
+  transition:
+    opacity 2s ease-in-out,
+    transform 2s ease-in-out,
+    visibility 2s;
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,0.4),
+    0 0 0 1px rgba(255,255,255,0.05);
+
+  font-family:'Poppins','Segoe UI',sans-serif;
+}
+
+/* ALTIN IŞIK EFEKTİ */
+#map-topbar::after{
+  content:"";
+  position:absolute;
+
+  bottom:0;
+  left:-25%;
+
+  width:25%;
+  height:2px;
+
+  background:linear-gradient(
+    90deg,
+    rgba(255,184,0,0),
+    rgba(255,184,0,0.25),
+    rgba(255,210,80,1),
+    rgba(255,184,0,0.25),
+    rgba(255,184,0,0)
+  );
+
+  filter:blur(0.5px);
+
+  box-shadow:
+    0 0 8px rgba(255,184,0,0.9),
+    0 0 16px rgba(255,184,0,0.6),
+    0 0 22px rgba(255,210,80,0.35);
+
+  animation:bottomLight 3.5s linear infinite;
+}
+
+@keyframes bottomLight{
+  0%{
+    left:-30%;
+  }
+
+  100%{
+    left:105%;
+  }
 }
 
 .topbar-title{
@@ -1264,6 +1321,66 @@ new mapboxgl.Marker({
 	});
 	
 	
+	const yolGeoJSON3 = {
+		type: "FeatureCollection",
+		features: [
+			{
+				type: "Feature",
+				geometry: {
+					type: "LineString",
+					coordinates: [
+						[34.004408, 38.369946],
+						[34.006591, 38.366684]
+					]
+				},
+				properties: {
+					title: "Ankara - Adana Yolu"
+				}
+			}
+		]
+	};
+
+	// SOURCE
+	map.addSource("yol3", {
+		type: "geojson",
+		data: yolGeoJSON3,
+		lineMetrics: true  
+	});
+
+	map.addLayer({
+		id: "yol-label-3",
+		type: "symbol",
+		source: "yol3",
+
+		layout: {
+			"symbol-placement": "line",
+			"text-field": ["get", "title"],
+			"text-size": 12,                // 🚀 Okunabilirlik için 1 tık büyütüldü
+
+			// 🔥 KRİTİK: yazıyı başlangıca yaklaştırır
+			"symbol-spacing": 150,
+
+			// sadece tek label üretir
+			"text-max-angle": 90,
+
+			"text-rotation-alignment": "map",
+			"text-keep-upright": true,
+
+			"text-allow-overlap": true,
+			"text-ignore-placement": true,
+			
+			"text-letter-spacing": 0.05    // 🚀 Harfler uyduda birbirine girmesin diye hafif açıldı
+		},
+
+		paint: {
+			"text-color": "#ffffff",        // 🚀 Uydu üzerinde en net duran BEYAZ ana renk yapıldı
+			"text-halo-color": "#1a1a1a",   // 🚀 Arkadaki pikselleri boğacak koyu siyah çerçeve
+			"text-halo-width": 2.5,         // 🚀 Çerçeve kalınlığı uydudan fırlaması için artırıldı
+			"text-halo-blur": 0.5           // 🚀 Yazıya doğal bir gölge havası verildi
+		}
+	});
+	
+	
 	
     // =========================================================
     
@@ -1733,7 +1850,7 @@ function startCarousel() {
 
 					if (d === i) {
 
-						dots[d].style.background = "#FFD700";
+						dots[d].style.background = "#FFB800";
 						dots[d].style.transform = "scale(1.15)";
 						dots[d].style.boxShadow = "0 0 10px rgba(255,215,0,0.9)";
 
