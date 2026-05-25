@@ -501,20 +501,40 @@ body {
         
         <!-- Carousel: Kutuyu tam kaplar -->
         <div id="finalCarousel" style="
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.2); border: 2px solid rgba(255,255,255,0.2); background-color: white;
-        ">
-            <img id="carouselImg" src="images/1.jpeg" style="
-                display: block; 
-                width: 100%; 
-                height: 100%; 
-                object-fit: cover; /* Resim artık kutuyu %100 doldurur */
-                transition: opacity 0.8s ease-in-out;
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			display: none;
+			border-radius: 15px;
+			overflow: hidden;
+			box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+			border: 2px solid rgba(255,255,255,0.2);
+			background-color: white;
+		">
+			<img id="carouselImg" src="images/1.jpeg" style="
+				display: block;
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				transition: opacity 0.8s ease-in-out;
 
 				will-change: opacity;
 				backface-visibility: hidden;
 				transform: translateZ(0);
-            ">
-        </div>
+			">
+		</div>
+
+		<div id="carouselDots" style="
+			position:absolute;
+			bottom:-28px;
+			left:50%;
+			transform:translateX(-50%);
+			display:flex;
+			gap:8px;
+			z-index:30;
+		"></div>
     </div>
 </div>
 
@@ -536,7 +556,7 @@ body {
 ">
 
     <!-- El İşareti -->
-<div id="clickIcon" style="
+	<div id="clickIcon" style="
 		font-size: 24px;
 		color: #FFD700;
 		transition: opacity 0.3s ease;
@@ -1614,7 +1634,9 @@ function startRotation() {
 				video.style.transition = "opacity 3000ms ease-in-out";
 				
 				requestAnimationFrame(() => {
-					video.style.opacity = "1";
+					setTimeout(() => {
+						video.style.opacity = "1";
+					}, 200);
 				});
 
 				video.play().then(() => {
@@ -1657,8 +1679,76 @@ function startCarousel() {
 
     const imgEl = document.getElementById("carouselImg");
     const carouselContainer = document.getElementById("finalCarousel");
+	const dotsContainer = document.getElementById("carouselDots");
 
     let i = 0;
+	
+	// DOTLARI OLUŞTUR
+		const maxVisibleDots = 5;
+		dotsContainer.innerHTML = "";
+
+		// DOTLARI OLUŞTUR
+		images.forEach(() => {
+
+			const dot = document.createElement("div");
+
+			dot.style.width = "7px";
+			dot.style.height = "7px";
+			dot.style.borderRadius = "50%";
+			dot.style.background = "rgba(0,0,0,0.35)";
+			dot.style.transition = "all 0.3s ease";
+			dot.style.display = "none"; // başlangıçta gizli
+
+			dotsContainer.appendChild(dot);
+		});
+
+		const dots = dotsContainer.children;
+
+
+		// AKTİF + KAYDIRMALI DOT SİSTEMİ
+		function updateDots() {
+
+			let start = i - Math.floor(maxVisibleDots / 2);
+			let end = start + maxVisibleDots;
+
+			// soldan taşmayı düzelt
+			if (start < 0) {
+				start = 0;
+				end = maxVisibleDots;
+			}
+
+			// sağdan taşmayı düzelt
+			if (end > images.length) {
+				end = images.length;
+				start = end - maxVisibleDots;
+				if (start < 0) start = 0;
+			}
+
+			for (let d = 0; d < dots.length; d++) {
+
+				// görünür aralık
+				if (d >= start && d < end) {
+
+					dots[d].style.display = "inline-block";
+
+					if (d === i) {
+
+						dots[d].style.background = "#FFD700";
+						dots[d].style.transform = "scale(1.15)";
+						dots[d].style.boxShadow = "0 0 10px rgba(255,215,0,0.9)";
+
+					} else {
+
+						dots[d].style.background = "rgba(0,0,0,0.35)";
+						dots[d].style.transform = "scale(1)";
+						dots[d].style.boxShadow = "none";
+					}
+
+				} else {
+					dots[d].style.display = "none";
+				}
+			}
+		}
 
     // preload
     images.forEach(src => {
@@ -1668,6 +1758,8 @@ function startCarousel() {
 
     imgEl.src = images[0];
     imgEl.style.opacity = 1;
+	
+	updateDots();
 
     function nextSlide() {
 
@@ -1707,6 +1799,8 @@ function startCarousel() {
             // browser repaint zorla
             requestAnimationFrame(() => {
                 imgEl.style.opacity = 1;
+				updateDots();
+
             });
 
         }, 800);
@@ -1718,6 +1812,7 @@ function startCarousel() {
     // İlk geçişi başlat
     setTimeout(nextSlide, 4000);
 }
+
 
 window.slogans = [
   {
