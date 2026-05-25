@@ -215,9 +215,9 @@ body {
 /* ===================================================== */
 #slogan-box {
   position: absolute;
-  left: 22%;
+  left: 20%;
   top: 120px; /* Üst panelle mesafe kısaltıldı (110'dan 75'e) */
-  width: 210px; /* Genişlik daraltıldı (210'dan 185'e) */
+  width: 220px; /* Genişlik daraltıldı (210'dan 185'e) */
   background: linear-gradient(135deg, rgba(15,15,20,0.95), rgba(5,5,10,0.92));
   backdrop-filter: blur(10px);
   border-left: 3px solid #ffb800; /* Çizgi bir tık inceltildi */
@@ -290,7 +290,7 @@ body {
 }
 
 .price-label {
-  font-size: 7.5px; /* Mikro boyut */
+  font-size: 8.5px; /* Mikro boyut */
   text-transform: uppercase;
   color: #ffb800;
   font-weight: 600;
@@ -1955,6 +1955,11 @@ window.slogans = [
   {
     text: "Yatırım Getirisi Olan",
     icon: "paragetiri"
+  },
+  {
+    text: "NOT: İçerisinde kiracı vardır",
+    icon: "bilgi",
+	color: "#ffb800"
   }
 ];
 
@@ -2018,6 +2023,10 @@ const sloganIcons = {
   
   takas: `
     <i class="fa-solid fa-repeat"></i>
+  `,
+
+  bilgi: `
+    <i class="fa-solid fa-info"></i>
   `
 };
 
@@ -2036,7 +2045,9 @@ function renderSlogans() {
       ${slogans.map(item => `
         <div class="slogan-item">
           <div class="slogan-icon">${sloganIcons[item.icon] || ""}</div>
-          <span>${item.text}</span>
+          <span style="color:${item.color || '#ffffff'}">
+			${item.text}
+		  </span>
         </div>
       `).join("")}
       
