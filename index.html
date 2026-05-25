@@ -509,6 +509,10 @@ body {
                 height: 100%; 
                 object-fit: cover; /* Resim artık kutuyu %100 doldurur */
                 transition: opacity 0.8s ease-in-out;
+
+				will-change: opacity;
+				backface-visibility: hidden;
+				transform: translateZ(0);
             ">
         </div>
     </div>
@@ -1633,51 +1637,79 @@ function startRotation() {
 
 // Carousel Başlatıcı
 function startCarousel() {
-    const images = ["images/1.jpeg", "images/2.jpeg", "images/3.jpeg", "images/4.jpeg", "images/5.jpeg","images/6.jpeg"];
+
+    const images = [
+        "images/1.jpeg",
+        "images/2.jpeg",
+        "images/3.jpeg",
+        "images/4.jpeg",
+        "images/5.jpeg",
+        "images/6.jpeg"
+    ];
+
     const imgEl = document.getElementById("carouselImg");
-    const carouselContainer = document.getElementById("finalCarousel"); // Konteynerin ID'si
+    const carouselContainer = document.getElementById("finalCarousel");
+
     let i = 0;
-    
-    // İlk resmi göster
-    imgEl.src = images[i];
+
+    // preload
+    images.forEach(src => {
+        const img = new Image();
+        img.src = src;
+    });
+
+    imgEl.src = images[0];
     imgEl.style.opacity = 1;
 
-    const interval = setInterval(() => {
+    function nextSlide() {
+
         i++;
-        if (i < images.length) {
-            imgEl.style.opacity = 0;
+
+        // Bittiğinde
+        if (i >= images.length) {
+
+            carouselContainer.style.transition = "opacity 1s ease";
+            carouselContainer.style.opacity = "0";
+
             setTimeout(() => {
-                imgEl.src = images[i];
+
+                carouselContainer.style.display = "none";
+
+                const logo = document.getElementById("bottom-logo");
+
+                if (logo) {
+                    logo.style.opacity = "1";
+                }
+
+                renderSlogans();
+
+            }, 1000);
+
+            return;
+        }
+
+        // Önce fade out
+        imgEl.style.opacity = 0;
+
+        // Fade out bitince resmi değiştir
+        setTimeout(() => {
+
+            imgEl.src = images[i];
+
+            // browser repaint zorla
+            requestAnimationFrame(() => {
                 imgEl.style.opacity = 1;
-            }, 800);
-        } else {
-            // 1. Döngüyü durdur
-            clearInterval(interval);
-            
-            // 2. Kapsayıcıyı (carouselContainer) yok et/gizle
-            if (carouselContainer) {
-                carouselContainer.style.transition = "opacity 1000ms ease";
-                carouselContainer.style.opacity = "0";
-            }
-            
-            // 3. Geçiş bittikten sonra tamamen temizle ve sloganı getir
-			setTimeout(() => {
-				if (carouselContainer) {
-					carouselContainer.style.display = "none";
-				}
+            });
 
-				// Logo elementini seç ve opaklığını 1 yaparak görünür kıl
-				const logo = document.getElementById('bottom-logo');
-				if (logo) {
-					logo.style.opacity = "1";
-				}
+        }, 800);
 
-				renderSlogans();
-			}, 1000);
-					}
-				}, 4000);
+        // Sonraki slide
+        setTimeout(nextSlide, 4000);
+    }
+
+    // İlk geçişi başlat
+    setTimeout(nextSlide, 4000);
 }
-
 
 window.slogans = [
   {
