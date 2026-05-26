@@ -112,18 +112,15 @@ body {
 /* ===================================================== */
 /* 🔊 SES BUTONU                                         */
 /* ===================================================== */
-/* Mevcut butonun */
 #soundBtn {
   position: fixed;
   right: 14px;
   bottom: 50px;
   width: 30px;
   height: 30px;
-  /* Flex özellikleri ikonu tam merkeze çiviler */
   display: flex;
   align-items: center;
   justify-content: center;
-  /* İkonun kutu içinde sağa sola kaymasını önlemek için: */
   padding: 0;
   margin: 0;
   
@@ -134,9 +131,14 @@ body {
   cursor: pointer;
   z-index: 99999;
   transition: 0.2s ease;
-  /* Fontun kutuya tam sığması için font-size ile oynayacağız */
   font-size: 18px; 
   line-height: 1;
+
+  /* --- MOBİL İÇİN TIKLAMA AYARLARI --- */
+  -webkit-tap-highlight-color: transparent; /* Mobil tıklama vurgusunu yok eder */
+  outline: none;                            /* Fokus dış çizgisini kaldırır */
+  user-select: none;                        /* Buton üzerindeki metin/ikon seçilmesini engeller */
+  -webkit-user-select: none;                /* Safari desteği */
 }
 
 #soundBtn:hover {
@@ -144,17 +146,28 @@ body {
   background: rgba(0,0,0,0.6);
 }
 
-/* İşaret parmağı ikonun */
+/* Tıklandığı anki durum (Aktif durum) */
+#soundBtn:active {
+  outline: none;
+  box-shadow: none;
+  transform: scale(0.95); /* Tıklandığında hafif küçülme efekti */
+}
+
+/* İşaret parmağı ikonu */
 #clickIcon {
-  position: fixed; /* Butonla aynı yere sabitlemek için */
-  right: 20px;      /* Butonun merkezine hizalamak için ayarlandı */
-  bottom: 95px;     /* Butonun tam 45px üstünde başlar */
+  position: fixed;
+  right: 20px;     
+  bottom: 95px;    
   font-size: 30px;
   pointer-events: none;
   z-index: 99998;
   transition: opacity 0.5s ease;
   animation: pulse 1.5s infinite;
+  
+  /* İkonun da vurgulanmasını engelle */
+  -webkit-tap-highlight-color: transparent;
 }
+
 
 /* Senin animasyonunla uyumlu dikey hareket */
 @keyframes pulse {
@@ -1759,7 +1772,7 @@ function startRotation() {
 
 				video.play().then(() => {
 					// ... video bittikten sonraki kısım
-					video.onended = () => {
+ 					video.onended= () => {
 					video.style.opacity = "0";
 					setTimeout(() => {
 						video.style.display = "none";
@@ -1768,15 +1781,14 @@ function startRotation() {
 						if (music) {
 							music.src = "images/tanitim_2.mp3"; 
 							music.load();
-							music.volume = 0;
-							music.pause();
+							music.volume = 1;
+							music.play().catch(err => console.log("Otomatik oynatma engellendi:", err));
 						}
 						
-						// Butonu "çalmıyor" moduna (xmark) çevir
 						const soundIcon = document.getElementById("soundIcon");
 						if (soundIcon) {
-							soundIcon.classList.remove('fa-volume-high');
-							soundIcon.classList.add('fa-volume-xmark');
+							soundIcon.classList.remove('fa-volume-xmark');
+							soundIcon.classList.add('fa-volume-high');
 						}
 						
 						// SADECE HOPARLÖRÜ (btn) GERİ GETİRİYORUZ
