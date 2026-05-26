@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="icon" type="image/png" href="images/yeni-logo.png">
-<meta property="og:image" content="https://netmaxgayrimenkul-ctrl.github.io/4468-5/images/yeni-logo.png">
+<link rel="icon" type="image/png" href="images/logo.png">
+<meta property="og:image" content="https://netmaxgayrimenkul-ctrl.github.io/4468-5/images/logo_2.png">
 <title>Parsel Ucuş + Sunum</title>
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
@@ -115,10 +115,10 @@ body {
 /* Mevcut butonun */
 #soundBtn {
   position: fixed;
-  right: 16px;
+  right: 14px;
   bottom: 50px;
-  width: 35px;
-  height: 35px;
+  width: 30px;
+  height: 30px;
   /* Flex özellikleri ikonu tam merkeze çiviler */
   display: flex;
   align-items: center;
@@ -147,7 +147,7 @@ body {
 /* İşaret parmağı ikonun */
 #clickIcon {
   position: fixed; /* Butonla aynı yere sabitlemek için */
-  right: 25px;      /* Butonun merkezine hizalamak için ayarlandı */
+  right: 20px;      /* Butonun merkezine hizalamak için ayarlandı */
   bottom: 95px;     /* Butonun tam 45px üstünde başlar */
   font-size: 30px;
   pointer-events: none;
@@ -383,13 +383,9 @@ body {
   transform:translateX(-50%) translateY(-10px);
 
   width:83vw;
-
   border-radius:5px;
-
   border-left:4px solid #ffb800;
-
   background:rgba(0,0,0,0.88);
-
   z-index:99999;
 
   display:flex;
@@ -421,7 +417,7 @@ body {
   left:-25%;
 
   width:25%;
-  height:2px;
+  height:3px;
 
   background:linear-gradient(
     90deg,
@@ -1702,19 +1698,24 @@ function startRotation() {
 		const music = document.getElementById("bgMusic");
 		const btn = document.getElementById("soundBtn");
 		const icon = document.getElementById("clickIcon");
+		const handIcon = document.getElementById("clickIcon");
 
-		if (music) {
-			if (!music.paused && music.volume > 0.01) {
-				fadeOutMusic(music, 4000);
-				if (typeof isPlaying !== 'undefined') isPlaying = false;
-				if (btn) { btn.textContent = "🔇"; btn.style.transition = "opacity 4s"; btn.style.opacity = "0"; }
-				if (icon) { icon.style.transition = "opacity 4s"; icon.style.opacity = "0"; }
-			} else {
-				music.pause();
-				music.volume = 0;
-			}
-			setTimeout(() => { if (btn) btn.remove(); if (icon) icon.remove(); }, 4000);
-		}
+		if (music && !music.paused && music.volume > 0.01) {
+                fadeOutMusic(music, 4000);
+            }
+            
+            // HEM HOPARLÖRÜ GİZLE, EL İŞARETİNİ KALDIR
+			const elementsToHide = [btn, handIcon];
+			elementsToHide.forEach(el => {
+				if (el) {
+					if (el.id === "clickIcon") { // Veya el ikonunun ID'si neyse
+						el.remove(); // DOM'dan tamamen siler
+					} else {
+						el.style.transition = "opacity 1s";
+						el.style.opacity = "0";
+					}
+				}
+			});
 
 		console.log("🔄 360 derece dönüş tamamlandı, görseller başlıyor.");
 
@@ -1757,17 +1758,42 @@ function startRotation() {
 				});
 
 				video.play().then(() => {
+					// ... video bittikten sonraki kısım
 					video.onended = () => {
-						video.style.opacity = "0";
-						setTimeout(() => {
-							video.style.display = "none";
-							const carousel = document.getElementById("finalCarousel");
-							if (carousel) {
-								carousel.style.display = "block";
-								startCarousel();
-							}
-						}, 3000);
-					};
+					video.style.opacity = "0";
+					setTimeout(() => {
+						video.style.display = "none";
+						
+						// --- İKİNCİ MÜZİK AYARLARI ---
+						if (music) {
+							music.src = "images/tanitim_2.mp3"; 
+							music.load();
+							music.volume = 0;
+							music.pause();
+						}
+						
+						// Butonu "çalmıyor" moduna (xmark) çevir
+						const soundIcon = document.getElementById("soundIcon");
+						if (soundIcon) {
+							soundIcon.classList.remove('fa-volume-high');
+							soundIcon.classList.add('fa-volume-xmark');
+						}
+						
+						// SADECE HOPARLÖRÜ (btn) GERİ GETİRİYORUZ
+						if (btn) { 
+							btn.style.opacity = "1"; 
+							btn.style.display = "flex"; 
+						}
+						
+						// EL İKONU BURADA YOK, DOLAYISIYLA İKİNCİ KEZ GÖRÜNMEYECEK
+						
+						const carousel = document.getElementById("finalCarousel");
+						if (carousel) {
+							carousel.style.display = "block";
+							startCarousel();
+						}
+					}, 3000);
+				};
 				}).catch(err => {
 					console.warn("Video başlatılamadı:", err);
 					video.style.display = "none";
@@ -1878,53 +1904,70 @@ function startCarousel() {
 	
 	updateDots();
 
-    function nextSlide() {
+    	function nextSlide() {
+		i++;
 
-        i++;
+		// --- BİTTİĞİNDE (Slaytlar tükendi) ---
+		if (i >= images.length) {
+			carouselContainer.style.transition = "opacity 1s ease";
+			carouselContainer.style.opacity = "0";
 
-        // Bittiğinde
-        if (i >= images.length) {
+			setTimeout(() => {
+				carouselContainer.style.display = "none";
 
-            carouselContainer.style.transition = "opacity 1s ease";
-            carouselContainer.style.opacity = "0";
+				const logo = document.getElementById("bottom-logo");
+				if (logo) {
+					logo.style.opacity = "1";
+				}
 
-            setTimeout(() => {
+				renderSlogans();
 
-                carouselContainer.style.display = "none";
+				// Müzik ve butonların 5 saniye sonra YUMUŞAKÇA kaldırılması
+				setTimeout(() => {
+					const music = document.getElementById("bgMusic");
+					const soundBtn = document.getElementById("soundBtn");
+					const handIcon = document.getElementById("clickIcon");
 
-                const logo = document.getElementById("bottom-logo");
+					// Müzik için yumuşak ses kısma (Fade-out)
+					if (music) {
+						let fadeAudio = setInterval(() => {
+							if (music.volume > 0.05) {
+								music.volume -= 0.05; // Sesi kademeli azalt
+							} else {
+								clearInterval(fadeAudio);
+								music.pause();
+								music.remove(); // DOM'dan tamamen kaldır
+								console.log("🎶 Müzik yumuşakça durduruldu ve kaldırıldı.");
+							}
+						}, 100); // 100ms'de bir azalt
+					}
 
-                if (logo) {
-                    logo.style.opacity = "1";
-                }
+					// Butonları DOM'dan kaldır
+					if (soundBtn) soundBtn.remove();
+					if (handIcon) handIcon.remove();
 
-                renderSlogans();
+				}, 5000); // Logo geldikten 5 saniye sonra başla
 
-            }, 1000);
+			}, 1000);
 
-            return;
-        }
+			return; // Döngüyü burada kesin olarak durduruyoruz
+		}
 
-        // Önce fade out
-        imgEl.style.opacity = 0;
+		// --- NORMAL AKIŞ (Slayt geçişi) ---
+		imgEl.style.opacity = 0;
 
-        // Fade out bitince resmi değiştir
-        setTimeout(() => {
+		setTimeout(() => {
+			imgEl.src = images[i];
 
-            imgEl.src = images[i];
-
-            // browser repaint zorla
-            requestAnimationFrame(() => {
-                imgEl.style.opacity = 1;
+			requestAnimationFrame(() => {
+				imgEl.style.opacity = 1;
 				updateDots();
+			});
+		}, 800);
 
-            });
-
-        }, 800);
-
-        // Sonraki slide
-        setTimeout(nextSlide, 4000);
-    }
+		// Sonraki slaydı tetikle
+		setTimeout(nextSlide, 4000);
+	}
 
     // İlk geçişi başlat
     setTimeout(nextSlide, 4000);
@@ -2024,7 +2067,7 @@ const sloganIcons = {
   takas: `
     <i class="fa-solid fa-repeat"></i>
   `,
-
+  
   bilgi: `
     <i class="fa-solid fa-info"></i>
   `
